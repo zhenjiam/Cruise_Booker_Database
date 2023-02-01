@@ -1,0 +1,93 @@
+<!-- Adapted module from: https://github.com/osu-cs340-ecampus/flask-starter-app/blob/master/bsg_people_app/templates/edit_people.j2
+Date: 06/06/2022 -->
+
+<html>
+
+<head>
+
+            <style>
+        table {
+          font-family: arial, sans-serif;
+          border-collapse: collapse;
+          width: 50%;
+        }
+        
+        td, th {
+          border: 1px solid #dddddd;
+          text-align: left;
+          padding: 8px;
+        }
+        
+        th:nth-child(even) {
+          background-color: #dddddd;
+        }
+        </style>
+
+	<title>Edit Trip</title>
+    <link href="style.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+    <div>
+        <table> 
+            <caption> Editing Trip: </caption>
+            <!-- Access Trips tuple passed from app.py -->
+            {% if Trips %}
+                <thead>
+                    <tr>
+                        <!-- Iterate through each key in the first entry to get the column name -->
+                        {% for key in Trips[0].keys() %}
+
+                        <!-- Create a <th> tag with the key inside of it, this will be our header row -->
+                        <th scope="col" Trips-field="{{ key }}" Trips-filter-control="input">{{ key }}</th>
+                        
+                        <!-- End of this for loop -->
+                        {% endfor %} 
+                    </tr>
+
+                <tbody>
+                    <!-- Now, iterate through every item in Trips -->
+                    {% for item in Trips %}
+                    <tr>
+                        <!-- Then iterate through every key in the current item dictionary -->
+                        {% for key in item.keys() %}
+                        
+                        <!-- Create a <td> element with the value of that key in it -->
+                        <td>{{item[key]}}</td> {% endfor %} 
+                    </tr> 
+                    {% endfor %} 
+            {% endif %} 
+        </table>
+
+<br>
+
+
+        <div id="edit">
+            <!-- form to edit Trip in Trips-->
+            <form id="editTrip" action="/edit_trip/{{Trips[0].tripID}}" method="post">
+                <legend><strong>Edit Trip</strong></legend>
+                <fieldset>
+                    <!-- We can preset form inputs to match attributes currently stored for 'id' of trip to be updated via value= and accessing our passed data tuple -->
+                    <!-- Create hidden form input to store the passed 'id' of the trip we are editing so we can access it easily in our 'POST' method in our app.py -->
+                    <input type="hidden" value="{{Trips[0].tripID}}" class="form-control" id="tripID" name="tripID" required>
+
+                    <label for="make">Start Date:</label>
+                    <input type="date" value="{{Trips[0].startDate}}" class="form-control" id="startDate" name="startDate" required>
+
+                    <label for="make">Cruise Ship ID:</label>
+                    <input type="number" value="{{Trips[0].cruiseShipID}}" class="form-control" id="cruiseShipID" name="cruiseShipID" required>
+
+                    <label for="make">Meal Plan ID:</label>
+                    <input type="number" value="{{Trips[0].mealID}}" class="form-control" id="mealID" name="mealID" required>
+
+                    <label for="make">Cabin ID:</label>
+                    <input type="number" value="{{Trips[0].cabinID}}" class="form-control" id="cabinID" name="cabinID" required>
+
+
+                </fieldset>
+                <input type="submit" value="Edit Trip" name="Edit_Trip" class="btn btn-primary" style="margin:.5rem;">
+                <a href='/trips'><input class="btn" type="button" value="cancel"></a>
+            </form>
+
+
+</html>

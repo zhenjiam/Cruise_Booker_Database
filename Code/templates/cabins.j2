@@ -1,0 +1,187 @@
+<!-- Adapted module from: https://github.com/osu-cs340-ecampus/flask-starter-app/blob/master/bsg_people_app/templates/people.j2
+Date: 06/06/2022 -->
+
+<html>
+<!-- Adapted from the people.html UI design -->
+<head>
+
+            <style>
+        table {
+          font-family: arial, sans-serif;
+          border-collapse: collapse;
+          width: 50%;
+		  margin-left: auto;
+		  margin-right: auto;
+    	}
+        
+        td, th {
+          border: 1px solid #dddddd;
+          text-align: left;
+          padding: 8px;
+        }
+        
+        th:nth-child(even) {
+          background-color: #dddddd;
+        }
+
+		.center {
+  		margin-left: auto;
+		margin-right: auto;
+		}
+
+		h1 {
+  		text-align: center;
+		}
+
+		btn btn-primary {
+		  margin-left: auto;
+		  margin-right: auto;
+		}
+        </style>
+
+	<title>Cabins</title>
+	<link href="style.css" rel="stylesheet" type="text/css" />
+	<script language="JavaScript">
+	function showform(dowhat) {
+		/*
+		 * four DIVS: browse, insert, update, delete
+		 * this function sets one visible the others not
+		 */
+		if(dowhat == 'insert') {
+			document.getElementById('browse').style.display = 'none';
+			document.getElementById('insert').style.display = 'block';
+			document.getElementById('edit').style.display = 'none';
+			document.getElementById('delete').style.display = 'none';
+		} else if(dowhat == 'update') {
+			document.getElementById('browse').style.display = 'none';
+			document.getElementById('insert').style.display = 'none';
+			document.getElementById('edit').style.display = 'block';
+			document.getElementById('delete').style.display = 'none';
+		} else if(dowhat == 'delete') {
+			document.getElementById('browse').style.display = 'none';
+			document.getElementById('insert').style.display = 'none';
+			document.getElementById('edit').style.display = 'none';
+			document.getElementById('delete').style.display = 'block';
+		} else if(dowhat == 'all') {
+			document.getElementById('browse').style.display = 'block';
+			document.getElementById('insert').style.display = 'block';
+			document.getElementById('edit').style.display = 'block';
+			document.getElementById('delete').style.display = 'block';
+		} else { //by default display browse
+			document.getElementById('browse').style.display = 'block';
+			document.getElementById('insert').style.display = 'none';
+			document.getElementById('edit').style.display = 'none';
+			document.getElementById('delete').style.display = 'none';
+		}
+	}
+	function newCabin() {
+		showform('insert');
+	}
+	function updateCabin(pid) {
+		showform('update');
+	}
+	function deleteCabin(pid) {
+		showform('delete');
+	}
+	function browseCabins() {
+		showform('browse');
+	}
+	function showAll() {
+		showform('all');
+	}
+	</script>
+</head>
+
+
+<body onload="browseCabins()">
+
+	<h1>
+ 	<table class=center>
+            <tr>
+              <th><a href="passengers">Passengers</a></th>
+              <th><a href="trips">Trips</a></th>
+              <th><a href="triphistories">Trip Histories</a></th>
+              <th><a href="cruiseships">CruiseShips</a></th>
+              <th><a href="cabins">Cabins</a></th>
+              <th><a href="mealplans">Meal Plans</a></th>
+
+
+	</table>
+	</h1>
+
+	<h1>Cabins Page</h1>
+	<div id="browse">
+		<table id=info>
+            <!-- Access Cabins tuple passed from app.py --> 
+			            {% if Cabins %}
+			    <thead>
+				    <tr>
+					    <!-- Iterate through each key in the first entry to get the column name -->
+                        {% for key in Cabins[0].keys() %}
+					    
+                        <!-- Create a <th> tag with the key inside of it, this will be our header row -->
+					    <th scope="col" Cabins-field="{{ key }}" Cabins-filter-control="input">{{ key }}</th>
+					
+                        <!-- End of this for loop -->
+                        {% endfor %} 
+                    </tr>
+
+				<tbody>
+					<!-- Now, iterate through every item in Cabins -->{% for item in Cabins %}
+					    <tr>
+						    <!-- Then iterate through every key in the current item dictionary -->
+                            {% for key in item.keys() %}
+
+						    <!-- Create a <td> element with the value of that key in it -->
+						    <td> {{item[key]}} </td> 
+                            {% endfor %}
+
+                            <!-- Create our edit buttons -->
+						    <td><a href="edit_cabin/{{item.cabinID}}" class="btn btn-default">Edit</a></td>
+
+					    </tr> 
+                        {% endfor %} 
+                {% endif %} 
+        </table>   
+
+	<input type="button" value="Add New Cabin" name="Add_New" class="btn btn-primary" onClick="newCabin()" style="margin:.5rem;">
+	<p>&nbsp;</p>
+	<a href='/'><input class="btn" type="button" value="Return Home" style="margin:.5rem;"></a>
+
+	</div>	<!-- browse -->
+
+	<div id="insert">
+		<!-- form to INSERT new Cabin into Cabins-->
+		<form id="insertCabin" action="/cabins" method="post">
+			<legend><strong>Add Cabin</strong></legend>
+			<fieldset>
+                <!-- placeholder shows ghost text, required forces an input, pattern forces input adherence -->
+				<label for="make">Cabin Type:</label>
+				<input type="text" class="form-control" id="cabinType" name="cabinType" placeholder="" required>
+
+				<label for="model">Special Needs:</label>
+				<input type="number" class="form-control" id="specialNeeds" name="specialNeeds" " min="0" max="1" required>
+
+            <!-- Create 'Add Cabin' and 'Cancel' buttons -->
+			<input type="submit" value="Add Cabin" name="Add_Cabin" class="btn btn-primary" style="margin:.5rem;">
+			<input class="btn" type="button" value="Cancel" onClick="browseCabins()"> 
+        </form>
+	</div><!--insert-->
+	<div id="edit">
+		<!-- form to edit Cabin in Cabins-->
+		<form id="editCabin" action="/edit_cabin/{{Cabins[0].cabinID}}" method="post">
+			<legend><strong>Edit Cabin</strong></legend>
+			<fieldset>
+				<input type="hidden" value="{{Cabins[0].cabinID}}" class="form-control" id="cabinID" name="cabinID" required>
+				<label for="cabinID">Cabin ID:</label>
+
+				<input type="text" class="form-control" id="cabinType" name="cabinType" pattern="[A-Za-z]{1,}" placeholder="{{Cabins[0].cabinType}}" required>
+				<label for="cabinType">Cabin Type:</label>
+
+				<input type="text" class="form-control" id="specialNeeds" name="specialNeeds" pattern="[A-Za-z0-9]{1,}" placeholder="{{Cabins[0].specialNeeds}}" required>
+				<label for="specialNeeds">Special Needs:</label>
+			</fieldset>
+        </form>
+	</div><!--edit-->
+</body>
+</html>

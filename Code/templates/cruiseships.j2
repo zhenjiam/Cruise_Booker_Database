@@ -1,0 +1,180 @@
+<!-- Adapted module from: https://github.com/osu-cs340-ecampus/flask-starter-app/blob/master/bsg_people_app/templates/people.j2
+Date: 06/06/2022 -->
+
+<html>
+<!-- Adapted from the people.html UI design -->
+<head>
+
+            <style>
+        table {
+          font-family: arial, sans-serif;
+          border-collapse: collapse;
+          width: 50%;
+		  margin-left: auto;
+		  margin-right: auto;
+        }
+        
+        td, th {
+          border: 1px solid #dddddd;
+          text-align: left;
+          padding: 8px;
+        }
+        
+        th:nth-child(even) {
+          background-color: #dddddd;
+        }
+
+		.center {
+  		margin-left: auto;
+  		margin-right: auto;
+		}
+
+		h1 {
+  		text-align: center;
+		}
+
+        </style>
+
+	<title>Cruise Ships</title>
+	<link href="style.css" rel="stylesheet" type="text/css" />
+	<script language="JavaScript">
+	function showform(dowhat) {
+		/*
+		 * four DIVS: browse, insert, update, delete
+		 * this function sets one visible the others not
+		 */
+		if(dowhat == 'insert') {
+			document.getElementById('browse').style.display = 'none';
+			document.getElementById('insert').style.display = 'block';
+			document.getElementById('edit').style.display = 'none';
+			document.getElementById('delete').style.display = 'none';
+		} else if(dowhat == 'update') {
+			document.getElementById('browse').style.display = 'none';
+			document.getElementById('insert').style.display = 'none';
+			document.getElementById('edit').style.display = 'block';
+			document.getElementById('delete').style.display = 'none';
+		} else if(dowhat == 'delete') {
+			document.getElementById('browse').style.display = 'none';
+			document.getElementById('insert').style.display = 'none';
+			document.getElementById('edit').style.display = 'none';
+			document.getElementById('delete').style.display = 'block';
+		} else if(dowhat == 'all') {
+			document.getElementById('browse').style.display = 'block';
+			document.getElementById('insert').style.display = 'block';
+			document.getElementById('edit').style.display = 'block';
+			document.getElementById('delete').style.display = 'block';
+		} else { //by default display browse
+			document.getElementById('browse').style.display = 'block';
+			document.getElementById('insert').style.display = 'none';
+			document.getElementById('edit').style.display = 'none';
+			document.getElementById('delete').style.display = 'none';
+		}
+	}
+	function newCruiseShip() {
+		showform('insert');
+	}
+	function updateCruiseShip(pid) {
+		showform('update');
+	}
+	function deleteCruiseShip(pid) {
+		showform('delete');
+	}
+	function browseCruiseShips() {
+		showform('browse');
+	}
+	function showAll() {
+		showform('all');
+	}
+	</script>
+</head>
+
+<body onload="browseCruiseShips()">
+	<h1>
+ 	<table class=center>
+            <tr>
+              <th><a href="passengers">Passengers</a></th>
+              <th><a href="trips">Trips</a></th>
+              <th><a href="triphistories">Trip Histories</a></th>
+              <th><a href="cruiseships">CruiseShips</a></th>
+              <th><a href="cabins">Cabins</a></th>
+              <th><a href="mealplans">Meal Plans</a></th>
+
+
+	</table>
+	</h1>
+	<h1>CruiseShips Page</h1>
+	<div id="browse">
+		<table>
+            <!-- Access Cabins tuple passed from app.py --> 
+            {% if CruiseShips %}
+			    <thead>
+				    <tr>
+					    <!-- Iterate through each key in the first entry to get the column name -->
+                        {% for key in CruiseShips[0].keys() %}
+					    
+                        <!-- Create a <th> tag with the key inside of it, this will be our header row -->
+					    <th scope="col" CruiseShips-field="{{ key }}" CruiseShips-filter-control="input">{{ key }}</th>
+					
+                        <!-- End of this for loop -->
+                        {% endfor %} 
+                    </tr>
+
+				<tbody>
+					<!-- Now, iterate through every item in CruiseShips -->{% for item in CruiseShips %}
+					    <tr>
+						    <!-- Then iterate through every key in the current item dictionary -->
+                            {% for key in item.keys() %}
+
+						    <!-- Create a <td> element with the value of that key in it -->
+						    <td> {{item[key]}} </td> 
+                            {% endfor %}
+
+                            <!-- Create our edit/delete buttons -->
+						    <td><a href="edit_cruiseship/{{item.cruiseShipID}}" class="btn btn-default">Edit</a></td>
+
+					    </tr> 
+                        {% endfor %} 
+                {% endif %} 
+        </table>   
+
+	<input type="button" value="Add New Cruise Ship" name="Add_CruiseShip" class="btn btn-primary" onClick="newCruiseShip()" style="margin:.5rem;">
+	<p>&nbsp;</p>
+	<a href='/'><input class="btn" type="button" value="Return Home" style="margin:.5rem;"></a>
+
+	</div>	<!-- browse -->
+
+	<div id="insert">
+		<!-- form to INSERT new Cruise Ship into CruiseShips-->
+		<form id="insertCruiseShip" action="/cruiseships" method="post">
+			<legend><strong>Add Cruise Ships</strong></legend>
+			<fieldset>
+                <!-- placeholder shows ghost text, required forces an input, pattern forces input adherence -->
+				<label for="make">Ship Name:</label>
+				<input type="text" class="form-control" id="shipName" name="shipName" placeholder="" required>
+
+				<label for="model">Destinations:</label>
+				<input type="text" class="form-control" id="destination" name="destination" " min="0" max="1" required>
+
+            <!-- Create 'Add Cruise Ships' and 'Cancel' buttons -->
+			<input type="submit" value="Add Cruise Ships" name="Add_CruiseShip" class="btn btn-primary" style="margin:.5rem;">
+			<input class="btn" type="button" value="Cancel" onClick="browseCruiseShips()"> 
+        </form>
+	</div><!--insert-->
+	<div id="edit">
+		<!-- form to edit Cruise Ship in CruiseShips-->
+		<form id="editCruiseShip" action="/edit_cruiseship/{{CruiseShips[0].cruiseShipID}}" method="post">
+			<legend><strong>Edit Cruise Ship</strong></legend>
+			<fieldset>
+				<input type="hidden" value="{{CruiseShips[0].cruiseShipID}}" class="form-control" id="cruiseShipID" name="cruiseShipID" required>
+				<label for="cruiseShipID">Cruise Ship ID:</label>
+
+				<input type="text" class="form-control" id="shipName" name="shipName" pattern="[A-Za-z]{1,}" placeholder="{{CruiseShips[0].shipName}}" required>
+				<label for="shipName">Ship Name:</label>
+
+				<input type="text" class="form-control" id="destinations" name="destinations" pattern="[A-Za-z0-9]{1,}" placeholder="{{CruiseShips[0].destinations}}" required>
+				<label for="destinations">Destinations:</label>
+			</fieldset>
+        </form>
+	</div><!--edit-->
+</body>
+</html>

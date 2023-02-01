@@ -1,0 +1,87 @@
+<!-- Adapted module from: https://github.com/osu-cs340-ecampus/flask-starter-app/blob/master/bsg_people_app/templates/edit_people.j2
+Date: 06/06/2022 -->
+
+<html>
+
+<head>
+
+            <style>
+        table {
+          font-family: arial, sans-serif;
+          border-collapse: collapse;
+          width: 50%;
+        }
+        
+        td, th {
+          border: 1px solid #dddddd;
+          text-align: left;
+          padding: 8px;
+        }
+        
+        th:nth-child(even) {
+          background-color: #dddddd;
+        }
+        
+        </style>
+
+	<title>Edit Cabins</title>
+    <link href="style.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+    <div>
+        <table> 
+            <caption> Editing Cabin: </caption>
+            <!-- Access Cabins tuple passed from app.py -->
+            {% if Cabins %}
+                <thead>
+                    <tr>
+                        <!-- Iterate through each key in the first entry to get the column name -->
+                        {% for key in Cabins[0].keys() %}
+
+                        <!-- Create a <th> tag with the key inside of it, this will be our header row -->
+                        <th scope="col" Cabins-field="{{ key }}" Cabins-filter-control="input">{{ key }}</th>
+                        
+                        <!-- End of this for loop -->
+                        {% endfor %} 
+                    </tr>
+
+                <tbody>
+                    <!-- Now, iterate through every item in Cabins -->
+                    {% for item in Cabins %}
+                    <tr>
+                        <!-- Then iterate through every key in the current item dictionary -->
+                        {% for key in item.keys() %}
+                        
+                        <!-- Create a <td> element with the value of that key in it -->
+                        <td>{{item[key]}}</td> {% endfor %} 
+                    </tr> 
+                    {% endfor %} 
+            {% endif %} 
+        </table>
+
+<br>
+
+
+        <div id="edit">
+            <!-- form to edit Cabin in Cabins-->
+            <form id="editCabin" action="/edit_cabin/{{Cabins[0].cabinID}}" method="post">
+                <legend><strong>Edit Cabin</strong></legend>
+                <fieldset>
+                    <!-- We can preset form inputs to match attributes currently stored for 'id' of cabin to be updated via value= and accessing our passed data tuple -->
+                    <!-- Create hidden form input to store the passed 'id' of the cabin we are editing so we can access it easily in our 'POST' method in our app.py -->
+                    <input type="hidden" value="{{Cabins[0].cabinID}}" class="form-control" id="cabinID" name="cabinID" required>
+                    <label for="make">Cabin Type:</label>
+
+                    <input type="text" value="{{Cabins[0].cabinType}}" class="form-control" id="cabinType" name="cabinType" required>
+                    <label for="model">Special Needs:</label>
+
+                    <input type="number" value="{{Cabins[0].specialNeeds}}" class="form-control" id="specialNeeds" name="specialNeeds" min="0" max="1" required>
+
+                </fieldset>
+                <input type="submit" value="Edit Cabin" name="Edit_Cabin" class="btn btn-primary" style="margin:.5rem;">
+                <a href='/cabins'><input class="btn" type="button" value="cancel"></a>
+            </form>
+
+
+</html>

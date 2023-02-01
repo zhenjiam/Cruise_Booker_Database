@@ -1,0 +1,102 @@
+<!-- Adapted module from: https://github.com/osu-cs340-ecampus/flask-starter-app/blob/master/bsg_people_app/templates/edit_people.j2
+Date: 06/06/2022 -->
+
+<html>
+
+<head>
+
+            <style>
+        table {
+          font-family: arial, sans-serif;
+          border-collapse: collapse;
+          width: 50%;
+        }
+        
+        td, th {
+          border: 1px solid #dddddd;
+          text-align: left;
+          padding: 8px;
+        }
+        
+        th:nth-child(even) {
+          background-color: #dddddd;
+        }
+        </style>
+
+	<title>Edit Passengers</title>
+    <link href="style.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+    <div>
+        <table> 
+            <caption> Editing Passenger: </caption>
+            <!-- Access Passengers tuple passed from app.py -->
+            {% if Passengers %}
+                <thead>
+                    <tr>
+                        <!-- Iterate through each key in the first entry to get the column name -->
+                        {% for key in Passengers[0].keys() %}
+
+                        <!-- Create a <th> tag with the key inside of it, this will be our header row -->
+                        <th scope="col" Passengers-field="{{ key }}" Passengers-filter-control="input">{{ key }}</th>
+                        
+                        <!-- End of this for loop -->
+                        {% endfor %} 
+                    </tr>
+
+                <tbody>
+                    <!-- Now, iterate through every item in Passengers -->
+                    {% for item in Passengers %}
+                    <tr>
+                        <!-- Then iterate through every key in the current item dictionary -->
+                        {% for key in item.keys() %}
+                        
+                        <!-- Create a <td> element with the value of that key in it -->
+                        <td>{{item[key]}}</td> {% endfor %} 
+                    </tr> 
+                    {% endfor %} 
+            {% endif %} 
+        </table>
+
+<br>
+
+
+        <div id="edit">
+            <!-- form to edit Passenger in Passengers-->
+            <form id="editPassenger" action="/edit_passenger/{{Passengers[0].passengerID}}" method="post">
+                <legend><strong>Edit Passenger</strong></legend>
+                <fieldset>
+                    <!-- We can preset form inputs to match attributes currently stored for 'id' of passenger to be updated via value= and accessing our passed data tuple -->
+                    <!-- Create hidden form input to store the passed 'id' of the passenger we are editing so we can access it easily in our 'POST' method in our app.py -->
+                    <input type="hidden" value="{{Passengers[0].passengerID}}" class="form-control" id="passengerID" name="passengerID" required>
+
+                    <label for="make">First Name:</label>
+                    <input type="text" value="{{Passengers[0].firstName}}" class="form-control" id="firstName" name="firstName" required>
+
+                    <label for="make">Last Name:</label>
+                    <input type="text" value="{{Passengers[0].lastName}}" class="form-control" id="lastName" name="lastName" required>
+
+                    <label for="make">Gender:</label>
+                    <input type="text" value="{{Passengers[0].gender}}" class="form-control" id="gender" name="gender" minlength="1" 
+                        maxlength="1" required>
+                    
+                    <label for="make">DOB:</label>
+                    <input type="date" value="{{Passengers[0].dob}}" class="form-control" id="dob" name="dob" required>
+
+                    <label for="make">Email:</label>
+                    <input type="email" value="{{Passengers[0].email}}" class="form-control" id="email" name="email" required>
+
+                    <label for="make">Phone Number:</label>
+                    <input type="tel" value="{{Passengers[0].phoneNumber}}" class="form-control" id="phoneNumber" name="phoneNumber" required>
+
+
+
+
+                </fieldset>
+                <input type="submit" value="Edit Passenger" name="Edit_Passenger" class="btn btn-primary" style="margin:.5rem;">
+                <a href='/passengers'><input class="btn" type="button" value="cancel"></a>
+            </form>
+
+
+</html>

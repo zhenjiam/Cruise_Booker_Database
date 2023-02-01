@@ -1,0 +1,180 @@
+<!-- Adapted module from: https://github.com/osu-cs340-ecampus/flask-starter-app/blob/master/bsg_people_app/templates/people.j2
+Date: 06/06/2022 -->
+
+<html>
+<!-- Adapted from the people.html UI design -->
+<head>
+
+            <style>
+        table {
+          font-family: arial, sans-serif;
+          border-collapse: collapse;
+          width: 50%;
+		  margin-left: auto;
+		  margin-right: auto;
+        }
+        
+        td, th {
+          border: 1px solid #dddddd;
+          text-align: left;
+          padding: 8px;
+        }
+        
+        th:nth-child(even) {
+          background-color: #dddddd;
+        }
+
+		.center {
+  		margin-left: auto;
+  		margin-right: auto;
+		}
+
+		h1 {
+  		text-align: center;
+		}
+
+        </style>
+
+	<title>Meal Plans</title>
+	<link href="style.css" rel="stylesheet" type="text/css" />
+	<script language="JavaScript">
+	function showform(dowhat) {
+		/*
+		 * four DIVS: browse, insert, update, delete
+		 * this function sets one visible the others not
+		 */
+		if(dowhat == 'insert') {
+			document.getElementById('browse').style.display = 'none';
+			document.getElementById('insert').style.display = 'block';
+			document.getElementById('edit').style.display = 'none';
+			document.getElementById('delete').style.display = 'none';
+		} else if(dowhat == 'update') {
+			document.getElementById('browse').style.display = 'none';
+			document.getElementById('insert').style.display = 'none';
+			document.getElementById('edit').style.display = 'block';
+			document.getElementById('delete').style.display = 'none';
+		} else if(dowhat == 'delete') {
+			document.getElementById('browse').style.display = 'none';
+			document.getElementById('insert').style.display = 'none';
+			document.getElementById('edit').style.display = 'none';
+			document.getElementById('delete').style.display = 'block';
+		} else if(dowhat == 'all') {
+			document.getElementById('browse').style.display = 'block';
+			document.getElementById('insert').style.display = 'block';
+			document.getElementById('edit').style.display = 'block';
+			document.getElementById('delete').style.display = 'block';
+		} else { //by default display browse
+			document.getElementById('browse').style.display = 'block';
+			document.getElementById('insert').style.display = 'none';
+			document.getElementById('edit').style.display = 'none';
+			document.getElementById('delete').style.display = 'none';
+		}
+	}
+	function newMealPlan() {
+		showform('insert');
+	}
+	function updateMealPlan(pid) {
+		showform('update');
+	}
+	function deleteMealPlan(pid) {
+		showform('delete');
+	}
+	function browseMealPlans() {
+		showform('browse');
+	}
+	function showAll() {
+		showform('all');
+	}
+	</script>
+</head>
+
+<body onload="browseMealPlans()">
+	<h1>
+ 	<table class=center>
+            <tr>
+              <th><a href="passengers">Passengers</a></th>
+              <th><a href="trips">Trips</a></th>
+              <th><a href="triphistories">Trip Histories</a></th>
+              <th><a href="cruiseships">CruiseShips</a></th>
+              <th><a href="cabins">Cabins</a></th>
+              <th><a href="mealplans">Meal Plans</a></th>
+
+
+	</table>
+	</h1>
+	<h1>Meal Plans Page</h1>
+	<div id="browse">
+		<table>
+            <!-- Access MealPlans tuple passed from app.py --> 
+            {% if MealPlans %}
+			    <thead>
+				    <tr>
+					    <!-- Iterate through each key in the first entry to get the column name -->
+                        {% for key in MealPlans[0].keys() %}
+					    
+                        <!-- Create a <th> tag with the key inside of it, this will be our header row -->
+					    <th scope="col" MealPlans-field="{{ key }}" MealPlans-filter-control="input">{{ key }}</th>
+					
+                        <!-- End of this for loop -->
+                        {% endfor %} 
+                    </tr>
+
+				<tbody>
+					<!-- Now, iterate through every item in MealPlans -->{% for item in MealPlans %}
+					    <tr>
+						    <!-- Then iterate through every key in the current item dictionary -->
+                            {% for key in item.keys() %}
+
+						    <!-- Create a <td> element with the value of that key in it -->
+						    <td> {{item[key]}} </td> 
+                            {% endfor %}
+
+                            <!-- Create our edit/delete buttons -->
+						    <td><a href="edit_mealplan/{{item.mealID}}" class="btn btn-default">Edit</a></td>
+
+					    </tr> 
+                        {% endfor %} 
+                {% endif %} 
+        </table>   
+
+	<input type="button" value="Add New Meal Plan" name="Add_MealPlan" class="btn btn-primary" onClick="newMealPlan()" style="margin:.5rem;">
+	<p>&nbsp;</p>
+	<a href='/'><input class="btn" type="button" value="Return Home" style="margin:.5rem;"></a>
+
+	</div>	<!-- browse -->
+
+	<div id="insert">
+		<!-- form to INSERT new Meal Plan into MealPlans-->
+		<form id="insertMealPlan" action="/mealplans" method="post">
+			<legend><strong>Add Meal Plans</strong></legend>
+			<fieldset>
+                <!-- placeholder shows ghost text, required forces an input, pattern forces input adherence -->
+				<label for="make">Meal Package:</label>
+				<input type="text" class="form-control" id="mealPackage" name="mealPackage" placeholder="" required>
+
+				<label for="model">Details:</label>
+				<input type="text" class="form-control" id="detail" name="detail"  required>
+
+            <!-- Create 'Add Meal Plan' and 'Cancel' buttons -->
+			<input type="submit" value="Add MealPlan" name="Add_MealPlan" class="btn btn-primary" style="margin:.5rem;">
+			<input class="btn" type="button" value="Cancel" onClick="browseMealPlans()"> 
+        </form>
+	</div><!--insert-->
+	<div id="edit">
+		<!-- form to edit Meal Plan in MealPlans-->
+		<form id="editMealPlan" action="/edit_mealplan/{{MealPlans[0].mealID}}" method="post">
+			<legend><strong>Edit Meal Plan</strong></legend>
+			<fieldset>
+				<input type="hidden" value="{{MealPlans[0].mealID}}" class="form-control" id="mealID" name="mealID" required>
+				<label for="mealID">Meal ID:</label>
+
+				<input type="text" class="form-control" id="mealPackage" name="mealPackage" pattern="[A-Za-z]{1,}" placeholder="{{MealPlans[0].mealPackage}}" required>
+				<label for="mealPackage">Meal Package:</label>
+
+				<input type="text" class="form-control" id="detail" name="detail" pattern="[A-Za-z0-9]{1,}" placeholder="{{MealPlans[0].detail}}" required>
+				<label for="detail">Details:</label>
+			</fieldset>
+        </form>
+	</div><!--edit-->
+</body>
+</html>

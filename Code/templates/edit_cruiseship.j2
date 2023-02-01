@@ -1,0 +1,86 @@
+<!-- Adapted module from: https://github.com/osu-cs340-ecampus/flask-starter-app/blob/master/bsg_people_app/templates/edit_people.j2
+Date: 06/06/2022 -->
+
+<html>
+<!-- Adapted from the edit_people.j2 UI design -->
+<head>
+
+            <style>
+        table {
+          font-family: arial, sans-serif;
+          border-collapse: collapse;
+          width: 50%;
+        }
+        
+        td, th {
+          border: 1px solid #dddddd;
+          text-align: left;
+          padding: 8px;
+        }
+        
+        th:nth-child(even) {
+          background-color: #dddddd;
+        }
+        </style>
+
+	<title>Edit CruiseShip</title>
+    <link href="style.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+    <div>
+        <table> 
+            <caption> Editing CruiseShip: </caption>
+            <!-- Access CruiseShips tuple passed from app.py -->
+            {% if CruiseShips %}
+                <thead>
+                    <tr>
+                        <!-- Iterate through each key in the first entry to get the column name -->
+                        {% for key in CruiseShips[0].keys() %}
+
+                        <!-- Create a <th> tag with the key inside of it, this will be our header row -->
+                        <th scope="col" CruiseShips-field="{{ key }}" CruiseShips-filter-control="input">{{ key }}</th>
+                        
+                        <!-- End of this for loop -->
+                        {% endfor %} 
+                    </tr>
+
+                <tbody>
+                    <!-- Now, iterate through every item in Cruise Ships -->
+                    {% for item in CruiseShips %}
+                    <tr>
+                        <!-- Then iterate through every key in the current item dictionary -->
+                        {% for key in item.keys() %}
+                        
+                        <!-- Create a <td> element with the value of that key in it -->
+                        <td>{{item[key]}}</td> {% endfor %} 
+                    </tr> 
+                    {% endfor %} 
+            {% endif %} 
+        </table>
+
+<br>
+
+
+        <div id="edit">
+            <!-- form to edit Cruise Ships in CruiseShips-->
+            <form id="editCruiseShip" action="/edit_cruiseship/{{CruiseShips[0].cruiseShipID}}" method="post">
+                <legend><strong>Edit Cruise Ship</strong></legend>
+                <fieldset>
+                    <!-- We can preset form inputs to match attributes currently stored for 'id' of cruiseship to be updated via value= and accessing our passed data tuple -->
+                    <!-- Create hidden form input to store the passed 'id' of the cruiseship we are editing so we can access it easily in our 'POST' method in our app.py -->
+                    <input type="hidden" value="{{CruiseShips[0].cruiseShipID}}" class="form-control" id="cruiseShipID" name="cruiseShipID" required>
+                    
+                    <label for="make">Ship Name:</label>
+                    <input type="text" value="{{CruiseShips[0].shipName}}" class="form-control" id="shipName" name="shipName" required>
+                    
+                    <label for="model">Destination:</label>
+                    <input type="text" value="{{CruiseShips[0].destination}}" class="form-control" id="destination" name="destination" required>
+
+                </fieldset>
+                <input type="submit" value="Edit CruiseShip" name="Edit_CruiseShip" class="btn btn-primary" style="margin:.5rem;">
+                <a href='/cruiseships'><input class="btn" type="button" value="cancel"></a>
+            </form>
+
+
+</html>

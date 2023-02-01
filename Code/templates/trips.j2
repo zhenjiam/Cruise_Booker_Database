@@ -1,0 +1,187 @@
+<!-- Adapted module from: https://github.com/osu-cs340-ecampus/flask-starter-app/blob/master/bsg_people_app/templates/people.j2
+Date: 06/06/2022 -->
+
+<html>
+<!-- Adapted from the people.html UI design -->
+<head>
+
+            <style>
+        table {
+          font-family: arial, sans-serif;
+          border-collapse: collapse;
+          width: 50%;
+		  margin-left: auto;
+		  margin-right: auto;
+        }
+        
+        td, th {
+          border: 1px solid #dddddd;
+          text-align: left;
+          padding: 8px;
+        }
+        
+        th:nth-child(even) {
+          background-color: #dddddd;
+        }
+
+		h1 {
+  		text-align: center;
+		}
+        </style>
+
+	<title>Trips</title>
+	<link href="style.css" rel="stylesheet" type="text/css" />
+	<script language="JavaScript">
+	function showform(dowhat) {
+		/*
+		 * four DIVS: browse, insert, update, delete
+		 * this function sets one visible the others not
+		 */
+		if(dowhat == 'insert') {
+			document.getElementById('browse').style.display = 'none';
+			document.getElementById('insert').style.display = 'block';
+			document.getElementById('edit').style.display = 'none';
+			document.getElementById('delete').style.display = 'none';
+		} else if(dowhat == 'update') {
+			document.getElementById('browse').style.display = 'none';
+			document.getElementById('insert').style.display = 'none';
+			document.getElementById('edit').style.display = 'block';
+			document.getElementById('delete').style.display = 'none';
+		} else if(dowhat == 'delete') {
+			document.getElementById('browse').style.display = 'none';
+			document.getElementById('insert').style.display = 'none';
+			document.getElementById('edit').style.display = 'none';
+			document.getElementById('delete').style.display = 'block';
+		} else if(dowhat == 'all') {
+			document.getElementById('browse').style.display = 'block';
+			document.getElementById('insert').style.display = 'block';
+			document.getElementById('edit').style.display = 'block';
+			document.getElementById('delete').style.display = 'block';
+		} else { //by default display browse
+			document.getElementById('browse').style.display = 'block';
+			document.getElementById('insert').style.display = 'none';
+			document.getElementById('edit').style.display = 'none';
+			document.getElementById('delete').style.display = 'none';
+		}
+	}
+	function newTrip() {
+		showform('insert');
+	}
+	function updateTrip(pid) {
+		showform('update');
+	}
+	function deleteTrip(pid) {
+		showform('delete');
+	}
+	function browseTrips() {
+		showform('browse');
+	}
+	function showAll() {
+		showform('all');
+	}
+	</script>
+</head>
+
+<body onload="browseTrips()">
+	<h1>
+ 	<table>
+            <tr>
+              <th><a href="passengers">Passengers</a></th>
+              <th><a href="trips">Trips</a></th>
+              <th><a href="triphistories">Trip Histories</a></th>
+              <th><a href="cruiseships">CruiseShips</a></th>
+              <th><a href="cabins">Cabins</a></th>
+              <th><a href="mealplans">Meal Plans</a></th>
+
+
+	</table>
+	</h1>
+	<h1>Trips Page</h1>
+	<div id="browse">
+		<table>
+            <!-- Access Trips tuple passed from app.py --> 
+            {% if Trips %}
+			    <thead>
+				    <tr>
+					    <!-- Iterate through each key in the first entry to get the column name -->
+                        {% for key in Trips[0].keys() %}
+					    
+                        <!-- Create a <th> tag with the key inside of it, this will be our header row -->
+					    <th scope="col" Trips-field="{{ key }}" Trips-filter-control="input">{{ key }}</th>
+					
+                        <!-- End of this for loop -->
+                        {% endfor %} 
+                    </tr>
+
+				<tbody>
+					<!-- Now, iterate through every item in Trips -->{% for item in Trips %}
+					    <tr>
+						    <!-- Then iterate through every key in the current item dictionary -->
+                            {% for key in item.keys() %}
+
+						    <!-- Create a <td> element with the value of that key in it -->
+						    <td> {{item[key]}} </td> 
+                            {% endfor %}
+
+                            <!-- Create our edit/delete buttons -->
+						    <td><a href="edit_trip/{{item.tripID}}" class="btn btn-default">Edit</a></td>
+						    <td><a href="delete_trip/{{item.tripID}}" class="btn btn-default">Delete</a></td>
+
+					    </tr> 
+                        {% endfor %} 
+                {% endif %} 
+        </table>   
+
+	<input type="button" value="Add New Trip" name="Add_New" class="btn btn-primary" onClick="newTrip()" style="margin:.5rem;"></a>
+	<p>&nbsp;</p>
+	<a href='/'><input class="btn" type="button" value="Return Home" style="margin:.5rem;"></a>
+	</div>	<!-- browse -->
+
+	<div id="insert">
+		<!-- form to INSERT new Trip into Trips-->
+		<form id="insertTrip" action="/trips" method="post">
+			<legend><strong>Add Trip</strong></legend>
+			<fieldset>
+                <!-- placeholder shows ghost text, required forces an input, pattern forces input adherence -->
+				<label for="make">Start Date:</label>
+				<input type="date" class="form-control" id="startDate" name="startDate" placeholder="" required>
+
+				<label for="make">Cruise Ship ID:</label>
+				<input type="number" class="form-control" id="cruiseShipID" name="cruiseShipID" placeholder="" required>
+
+                <label for="make">Meal Plan ID:</label>
+				<input type="number" class="form-control" id="mealID" name="mealID" placeholder="" required>
+
+				<label for="make">Cabin ID:</label>
+				<input type="number" class="form-control" id="cabinID" name="cabinID" placeholder="" required>
+
+            <!-- Create 'Add Trip' and 'Cancel' buttons -->
+			<input type="submit" value="Add Trip" name="Add_Trip" class="btn btn-primary" style="margin:.5rem;">
+			<input class="btn" type="button" value="Cancel" onClick="browseTrips()"> 
+        </form>
+	</div><!--insert-->
+	<div id="edit">
+		<!-- form to edit Trip in Trips-->
+		<form id="editTrip" action="/edit_trip/{{Trips[0].tripID}}" method="post">
+			<legend><strong>Edit Trip</strong></legend>
+			<fieldset>
+				<input type="hidden" value="{{Trips[0].tripID}}" class="form-control" id="tripID" name="tripID" required>
+				<label for="tripID">Trip ID:</label>
+
+				<input type="date" class="form-control" id="startDate" name="startDate" placeholder="{{Trips[0].startDate}}" required>
+				<label for="startDate">Start Date:</label>
+
+                <input type="number" class="form-control" id="cruiseShipID" name="cruiseShipID" placeholder="{{Trips[0].cruiseShipID}}" required>
+				<label for="cruiseShipID">Cruise Ship ID:</label>
+
+				<input type="number" class="form-control" id="mealID" name="mealID" placeholder="{{Trips[0].mealID}}" required>
+				<label for="mealID">Meal Plan ID:</label>
+
+				<input type="number" class="form-control" id="cabinID" name="cabinID" placeholder="{{Trips[0].cabinID}}" required>
+				<label for="cabinID">Cabin ID:</label>
+
+			</fieldset>
+        </form>
+	</div><!--edit-->
+</body>
+</html>

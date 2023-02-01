@@ -1,0 +1,206 @@
+<!-- Adapted module from: https://github.com/osu-cs340-ecampus/flask-starter-app/blob/master/bsg_people_app/templates/people.j2
+Date: 06/06/2022 -->
+
+<html>
+<!-- Adapted from the people.html UI design -->
+<head>
+
+            <style>
+        table {
+          font-family: arial, sans-serif;
+          border-collapse: collapse;
+          width: 50%;
+		  margin-left: auto;
+		  margin-right: auto;
+        }
+        
+        td, th {
+          border: 1px solid #dddddd;
+          text-align: left;
+          padding: 8px;
+        }
+        
+        th:nth-child(even) {
+          background-color: #dddddd;
+        }
+
+		.center {
+  		margin-left: auto;
+  		margin-right: auto;
+		}
+
+		h1 {
+  		text-align: center;
+		}
+		
+        </style>
+
+	<title>Passengers</title>
+	<link href="style.css" rel="stylesheet" type="text/css" />
+	<script language="JavaScript">
+	function showform(dowhat) {
+		/*
+		 * four DIVS: browse, insert, update, delete
+		 * this function sets one visible the others not
+		 */
+		if(dowhat == 'insert') {
+			document.getElementById('browse').style.display = 'none';
+			document.getElementById('insert').style.display = 'block';
+			document.getElementById('edit').style.display = 'none';
+			document.getElementById('delete').style.display = 'none';
+		} else if(dowhat == 'update') {
+			document.getElementById('browse').style.display = 'none';
+			document.getElementById('insert').style.display = 'none';
+			document.getElementById('edit').style.display = 'block';
+			document.getElementById('delete').style.display = 'none';
+		} else if(dowhat == 'delete') {
+			document.getElementById('browse').style.display = 'none';
+			document.getElementById('insert').style.display = 'none';
+			document.getElementById('edit').style.display = 'none';
+			document.getElementById('delete').style.display = 'block';
+		} else if(dowhat == 'all') {
+			document.getElementById('browse').style.display = 'block';
+			document.getElementById('insert').style.display = 'block';
+			document.getElementById('edit').style.display = 'block';
+			document.getElementById('delete').style.display = 'block';
+		} else { //by default display browse
+			document.getElementById('browse').style.display = 'block';
+			document.getElementById('insert').style.display = 'none';
+			document.getElementById('edit').style.display = 'none';
+			document.getElementById('delete').style.display = 'none';
+		}
+	}
+	function newPassenger() {
+		showform('insert');
+	}
+	function updatePassenger(pid) {
+		showform('update');
+	}
+	function deletePassenger(pid) {
+		showform('delete');
+	}
+	function browsePassengers() {
+		showform('browse');
+	}
+	function showAll() {
+		showform('all');
+	}
+	</script>
+</head>
+
+<body onload="browsePassengers()">
+	<h1>
+ 	<table class=center>
+            <tr>
+              <th><a href="passengers">Passengers</a></th>
+              <th><a href="trips">Trips</a></th>
+              <th><a href="triphistories">Trip Histories</a></th>
+              <th><a href="cruiseships">CruiseShips</a></th>
+              <th><a href="cabins">Cabins</a></th>
+              <th><a href="mealplans">Meal Plans</a></th>
+
+
+	</table>
+	</h1>
+	<h1>Passengers Page</h1>
+	<div id="browse">
+		<table>
+            <!-- Access Passengers tuple passed from app.py --> 
+            {% if Passengers %}
+			    <thead>
+				    <tr>
+					    <!-- Iterate through each key in the first entry to get the column name -->
+                        {% for key in Passengers[0].keys() %}
+					    
+                        <!-- Create a <th> tag with the key inside of it, this will be our header row -->
+					    <th scope="col" Passengers-field="{{ key }}" Passengers-filter-control="input">{{ key }}</th>
+					
+                        <!-- End of this for loop -->
+                        {% endfor %} 
+                    </tr>
+
+				<tbody>
+					<!-- Now, iterate through every item in Passengers -->{% for item in Passengers %}
+					    <tr>
+						    <!-- Then iterate through every key in the current item dictionary -->
+                            {% for key in item.keys() %}
+
+						    <!-- Create a <td> element with the value of that key in it -->
+						    <td> {{item[key]}} </td> 
+                            {% endfor %}
+
+                            <!-- Create our edit/delete buttons -->
+						    <td><a href="edit_passenger/{{item.passengerID}}" class="btn btn-default">Edit</a></td>
+						    <td><a href="delete_passenger/{{item.passengerID}}" class="btn btn-default">Delete</a></td>
+
+					    </tr> 
+                        {% endfor %} 
+                {% endif %} 
+        </table>   
+
+	<input type="button" value="Add New Passenger" name="Add_New" class="btn btn-primary" onClick="newPassenger()" style="margin:.5rem;">
+	<p>&nbsp;</p>
+	<a href='/'><input class="btn" type="button" value="Return Home" style="margin:.5rem;"></a>
+
+	</div>	<!-- browse -->
+
+	<div id="insert">
+		<!-- form to INSERT new Passenger into Passengers-->
+		<form id="insertPassenger" action="/passengers" method="post">
+			<legend><strong>Add Passenger</strong></legend>
+			<fieldset>
+                <!-- placeholder shows ghost text, required forces an input, pattern forces input adherence -->
+				<label for="make">First Name:</label>
+				<input type="text" class="form-control" id="firstName" name="firstName" placeholder="" required>
+
+                <label for="make">Last Name:</label>
+				<input type="text" class="form-control" id="lastName" name="lastName" placeholder="" required>
+
+                <label for="make">Gender:</label>
+				<input type="text" class="form-control" id="gender" name="gender" placeholder="F/M" minlength="1" 
+                    maxlength="1" required>
+                
+                <label for="make">DOB:</label>
+				<input type="date" class="form-control" id="dob" name="dob" placeholder="" required>
+
+                <label for="make">Email:</label>
+				<input type="email" class="form-control" id="email" name="email" placeholder="" required>
+
+				<label for="make">Phone Number:</label>
+				<input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" placeholder="###-###-####" required>
+
+            <!-- Create 'Add Passenger' and 'Cancel' buttons -->
+			<input type="submit" value="Add Passenger" name="Add_Passenger" class="btn btn-primary" style="margin:.5rem;">
+			<input class="btn" type="button" value="Cancel" onClick="browsePassengers()"> 
+        </form>
+	</div><!--insert-->
+	<div id="edit">
+		<!-- form to edit Passenger in Passengers-->
+		<form id="editPassenger" action="/edit_passenger/{{Passengers[0].passengerID}}" method="post">
+			<legend><strong>Edit Passenger</strong></legend>
+			<fieldset>
+				<input type="hidden" value="{{Passengers[0].passengerID}}" class="form-control" id="passengerID" name="passengerID" required>
+				<label for="passengerID">Passenger ID:</label>
+
+				<input type="text" class="form-control" id="firstName" name="firstName" pattern="[A-Za-z]{1,}" placeholder="{{Passengers[0].firstName}}" required>
+				<label for="firstName">First Name:</label>
+
+                <input type="text" class="form-control" id="lastName" name="lastName" pattern="[A-Za-z]{1,}" placeholder="{{Passengers[0].lastName}}" required>
+				<label for="lastName">Last Name:</label>
+
+                <input type="text" class="form-control" id="gender" name="gender" pattern="[A-Za-z]{1,}" placeholder="{{Passengers[0].gender}}" required>
+				<label for="firstName">Gender:</label>
+
+                <input type="date" class="form-control" id="dob" name="dob" pattern="\d{4}-\d{2}-\d{2}" placeholder="{{Passengers[0].dob}}" required>
+				<label for="dob">DOB:</label>
+
+                <input type="email" class="form-control" id="email" name="email" placeholder="{{Passengers[0].email}}" required>
+				<label for="email">Email:</label>
+
+				<input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" placeholder="{{Passengers[0].phoneNumber}}" required>
+				<label for="phoneNumber">Phone Number:</label>
+			</fieldset>
+        </form>
+	</div><!--edit-->
+</body>
+</html>
